@@ -1,19 +1,5 @@
 const fs = require('fs')
-
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../mock-data/tours-simple.json`)
-)
-
-exports.checkID = (req, res, next, val) => {
-  if (req.params.id * 1 > tours.length) {
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    })
-  }
-
-  next()
-}
+const Tour = require('../models/tourModels')
 
 exports.checkBody = (req, res, next) => {
   if (!req.body.name || !req.body.price) {

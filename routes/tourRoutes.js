@@ -9,7 +9,7 @@ const {
   checkBody,
 } = require('./../controllers/tourController')
 
-router.param('tourId', checkID)
+// router.param('tourId', checkID)
 
 router.route('/').get(getAllTours).post(checkBody, createNewTour)
 router.route('/:tourId').get(getTour).patch(updateTour)
