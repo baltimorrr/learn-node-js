@@ -26,3 +26,21 @@ const PORT = 3000
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}...`)
 })
+
+process.on('unhandledRejection', (err) => {
+  console.log(err?.name, err?.message)
+  console.log('UNHANDLER REJECTION!')
+
+  server.close(() => {
+    process.exit(1)
+  })
+})
+
+process.on('uncaughtException', (err) => {
+  console.log(err?.name, err?.message)
+  console.log('UNHANDLER EXCEPTION! Shutting down...')
+
+  server.close(() => {
+    process.exit(1)
+  })
+})
