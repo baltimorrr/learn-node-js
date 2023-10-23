@@ -61,5 +61,5 @@ module.exports = (err, req, res, next) => {
     return
   }
 
-  sendErrorDev()
+  sendErrorDev({ ...err }, res)
 }
