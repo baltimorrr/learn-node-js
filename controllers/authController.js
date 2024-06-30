@@ -12,20 +12,24 @@ const signToken = (data) => {
   })
 }
 
-exports.signup = CatchAsync(async (req, res, next) => {
-  const newUser = await User.create(req?.body)
-
+const createSendToken = (user, statusCode, res) => {
   const token = signToken({
-    id: newUser._id,
+    id: user._id,
   })
 
-  res.status(201).json({
+  res.status(statusCode).json({
     status: 'success',
     token,
     data: {
-      user: newUser,
+      user,
     },
   })
+}
+
+exports.signup = CatchAsync(async (req, res, next) => {
+  const newUser = await User.create(req?.body)
+
+  createSendToken(newUser, 201, res)
 })
 
 exports.login = CatchAsync(async (req, res, next) => {
@@ -43,13 +47,7 @@ exports.login = CatchAsync(async (req, res, next) => {
     return next(new AppError('Incorrecting email or password', 401))
   }
   // 3. if everything ok, send token to client
-  const token = signToken({
-    id: user._id,
-  })
-  res.status(200).json({
-    status: 'success',
-    token,
-  })
+  createSendToken(user, 200, res)
 })
 
 exports.protect = CatchAsync(async (req, res, next) => {
@@ -168,11 +166,26 @@ exports.resetPassword = async (req, res, next) => {
   // 3. update changedPasswordAt property for the user
 
   // 4. Log the user in, send JWT
-  const token = signToken({
-    id: user._id,
-  })
-  res.status(200).json({
-    status: 'success',
-    token,
-  })
+  createSendToken(user, 200, res)
 }
+
+exports.updatePassword = CatchAsync(async (req, res, next) => {
+  // 1. get user from collection
+  const user = await User.findById(req?.user?.id).select('+password')
+  // 2. check if posted current password is correct
+  const isCorrectPassword = await user.correctPassword(
+    req?.body?.passwordCurrent,
+    user?.password
+  )
+
+  if (!isCorrectPassword)
+    return next(new AppError('Your current password is wrong.', 401))
+
+  // 3. if so, update password
+  user.password = req?.body?.password
+  user.passwordConfirm = req?.body?.passwordConfirm
+  await user.save()
+
+  // 4. log user in, send JWT
+  createSendToken(user, 200, res)
+})
