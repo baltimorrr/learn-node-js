@@ -4,6 +4,7 @@ DATABASE=mongodb+srv://minh15553a1:<PASSWORD>@cluster0.uvmqhl1.mongodb.net/natou
 
 JWT_SECRET=test-secret-1234
 JWT_EXPIRES_IN=90d
+JWT_COOKIE_EXPIRES_IN=90
 
 EMAIL_USERNAME=1a5335aa1d9214
 EMAIL_PASSWORD=********5c25
